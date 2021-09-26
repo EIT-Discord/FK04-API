@@ -1,0 +1,7 @@
+flask~=2.0.1
+flask-restful
+flask-sqlalchemy
+requests~=2.26.0
+
+bs4~=0.0.1
+beautifulsoup4~=4.10.0
