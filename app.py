@@ -22,7 +22,7 @@ class Professor(db.Model):
     room = db.Column(db.String(100))
     description = db.Column(db.String(1000))
     moodleCourses = db.Column(db.String(100))
-    imagUrl = db.Column(db.String(200))
+    imageUrl = db.Column(db.String(200))
 
     def __repr__(self):
         return self.name
