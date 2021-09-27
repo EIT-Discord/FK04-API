@@ -18,7 +18,10 @@ class Professor(db.Model):
     email = db.Column(db.String(100))
     phone = db.Column(db.String(100))
     fax = db.Column(db.String(100))
+    address = db.Column(db.String(100))
     room = db.Column(db.String(100))
+    description = db.Column(db.String(1000))
+    moodleCourses = db.Column(db.String(100))
     image_url = db.Column(db.String(200))
 
     def __repr__(self):
@@ -31,9 +34,13 @@ class ProfessorsAPI(Resource):
         'name': fields.String,
         'email': fields.String,
         'phone': fields.String,
+        'address': fields.String,
         'room': fields.String,
+        'description': fields.String,
         'image_url': fields.String,
-        'uri': fields.Url('professor', absolute=True)
+        'moodleCourses': fields.String,
+        'uri': fields.Url('professor', absolute=True),
+
     }
 
     def get(self):
@@ -46,7 +53,10 @@ class ProfessorAPI(Resource):
         'name': fields.String,
         'email': fields.String,
         'phone': fields.String,
+        'address': fields.String,
         'room': fields.String,
+        'description': fields.String,
+        'moodleCourses': fields.String,
         'image_url': fields.String,
         'uri': fields.Url('professor', absolute=True)
     }
