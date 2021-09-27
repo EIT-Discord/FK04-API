@@ -22,7 +22,7 @@ class Professor(db.Model):
     room = db.Column(db.String(100))
     description = db.Column(db.String(1000))
     moodleCourses = db.Column(db.String(100))
-    image_url = db.Column(db.String(200))
+    imagUrl = db.Column(db.String(200))
 
     def __repr__(self):
         return self.name
@@ -37,7 +37,7 @@ class ProfessorsAPI(Resource):
         'address': fields.String,
         'room': fields.String,
         'description': fields.String,
-        'image_url': fields.String,
+        'imageUrl': fields.String,
         'moodleCourses': fields.String,
         'uri': fields.Url('professor', absolute=True),
 
@@ -57,7 +57,7 @@ class ProfessorAPI(Resource):
         'room': fields.String,
         'description': fields.String,
         'moodleCourses': fields.String,
-        'image_url': fields.String,
+        'imageUrl': fields.String,
         'uri': fields.Url('professor', absolute=True)
     }
 
