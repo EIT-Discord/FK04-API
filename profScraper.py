@@ -1,7 +1,8 @@
 import re
+import requests
 
 from bs4 import BeautifulSoup
-import requests
+
 from app import Professor, db
 
 sourceUrl = 'https://www.ee.hm.edu/fk04/profs/professoren.de.html'
@@ -42,7 +43,6 @@ for url in htmls:
     phone, fax = (re.sub(r'[^0-9 -]', '', field) for field in contact.text.strip().split('\n')[:2])
     image_url = image.attrs['src']
 
-
     room = ''
     address = ''
     for string in faculty.text.strip().split('\n'):
@@ -52,7 +52,7 @@ for url in htmls:
             address = string[string.find(' '):]
 
     new_prof = Professor(name=name, phone=phone, fax=fax, address=address, room=room, moodleCourses=moodle_courses,
-                         description=description, image_url=image_url)
+                         description=description, imageUrl=image_url)
     db.session.add(new_prof)
 
 db.session.commit()
