@@ -28,7 +28,7 @@ def need_authorization(function):
         token = auth.lstrip('Bearer ')
 
         if not ActiveToken.query.filter_by(token=token).first():
-            return {'message': 'Invalid token provided'}, 401
+            return {'message': 'Invalid token'}, 401
 
         return function(*args, **kwargs)
 
@@ -67,10 +67,10 @@ class LoginAPI(Resource):
         password = request.json.get('password')
 
         if username is None or password is None:
-            return {'message': 'No username or password provided with request.'}, 401
+            return {'message': 'No username or password provided'}, 401
 
         if not APIUser.query.filter_by(username=username, password=password).first():
-            return {'message': 'Incorrect username or password.'}, 401
+            return {'message': 'Incorrect username or password'}, 401
 
         token = str(uuid.uuid4())
         db.session.add(ActiveToken(token=token, username=username))
