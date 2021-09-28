@@ -52,7 +52,7 @@ class Professor(db.Model):
 
 
 class APIUser(db.Model):
-    userame = db.Column(db.String(100), primary_key=True)
+    username = db.Column(db.String(100), primary_key=True)
     password = db.Column(db.String(100))
 
 
@@ -126,8 +126,4 @@ class ProfessorAPI(Resource):
 # Endpoint configuration
 api.add_resource(ProfessorsAPI, '/api/professors', endpoint='professors')
 api.add_resource(ProfessorAPI, '/api/professors/<int:id>', endpoint='professor')
-api.add_resource(ProfessorAPI, '/api/login', endpoint='login')
-
-
-if __name__ == '__main__':
-    db.create_all()
+api.add_resource(LoginAPI, '/api/login', endpoint='login')
