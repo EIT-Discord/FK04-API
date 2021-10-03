@@ -1,4 +1,7 @@
-from app import db, APIUser
+# (c) 2021 Yannic Breiting, Martin Kistler
+
+from src.app import db
+from src.db_models import APIUser
 
 
 def new_api_user(username: str, password: str):
