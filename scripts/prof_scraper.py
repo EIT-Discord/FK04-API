@@ -1,9 +1,13 @@
-import re
-import requests
+# (c) 2021 Yannic Breiting, Martin Kistler
 
+import re
+
+import requests
 from bs4 import BeautifulSoup
 
-from app import Professor, db
+from src.app import db
+from src.db_models import Professor
+
 
 sourceUrl = 'https://www.ee.hm.edu/fk04/profs/professoren.de.html'
 baseUrl = 'https://www.ee.hm.edu/fk04/profs/'
