@@ -1,3 +1,7 @@
+# (c) 2021 Yannic Breiting, Martin Kistler
+
+from datetime import datetime
+import functools
 import uuid
 
 from flask import request
@@ -6,52 +10,64 @@ from flask_restful import Resource, fields, marshal
 from src.db_models import Professor, APIUser, ActiveToken, db
 
 
-def need_authorization(function):
-    def authorization(*args, **kwargs):
+def needs_authorization(function):
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
         auth = request.headers.get('Authorization')
 
+        # No authentication provided
         if auth is None:
-            return {'message': 'UNAUTHORIZED'}, 401
+            return 'UNAUTHORIZED', 401, {'WWW-Authenticate': 'Bearer'}
 
+        # wrong authentication scheme provided
         if not auth.startswith('Bearer '):
-            return {'message': 'Invalid authentication scheme'}, 401
+            return 'Invalid authentication scheme', 401, {'WWW-Authenticate': 'Bearer'}
 
-        token = auth.lstrip('Bearer ')
+        raw_token = auth.removeprefix('Bearer ')
+        token = ActiveToken.query.filter_by(token=raw_token).first()
 
-        if not ActiveToken.query.filter_by(token=token).first():
-            return {'message': 'Invalid token'}, 401
+        # invalid token provided
+        if token is None:
+            return 'Invalid token', 401, {'WWW-Authenticate': 'Bearer'}
+
+        # expired token provided
+        if token.is_expired():
+            return 'Token expired', 401, {'WWW-Authenticate': 'Bearer'}
 
         return function(*args, **kwargs)
 
-    return authorization
+    return wrapper
 
 
 class LoginAPI(Resource):
     def post(self):
+        if not request.is_json:
+            return 'request must be of Content-Type: application/json', 401
+
         username = request.json.get('username')
         password = request.json.get('password')
 
         if username is None or password is None:
-            return {'message': 'No username or password provided'}, 401
+            return 'No username or password provided', 401
 
         if not APIUser.query.filter_by(username=username, password=password).first():
-            return {'message': 'Incorrect username or password'}, 401
+            return 'Incorrect username or password', 401
 
         token = str(uuid.uuid4())
-        db.session.add(ActiveToken(token=token, username=username))
+        db.session.add(ActiveToken(token=token, username=username, created=datetime.now()))
         db.session.commit()
 
-        return {'token': token}
+        return {'token': token}, 200
 
 
 class LogoutAPI(Resource):
-    @need_authorization
+    @needs_authorization
     def get(self):
         token = request.headers.get('Authorization').lstrip('Bearer ')
         db.session.delete(ActiveToken.query.filter_by(token=token))
         db.session.commit()
 
-        return {'message': 'Logout successful'}
+        return 'Logout successful', 200
 
 
 class ProfessorsAPI(Resource):
@@ -66,10 +82,9 @@ class ProfessorsAPI(Resource):
         'imageUrl': fields.String,
         'moodleCourses': fields.String,
         'uri': fields.Url('professor', absolute=True),
-
     }
 
-    @need_authorization
+    @needs_authorization
     def get(self):
         name = request.args.get('name')
 
@@ -93,6 +108,6 @@ class ProfessorAPI(Resource):
         'uri': fields.Url('professor', absolute=True)
     }
 
-    @need_authorization
+    @needs_authorization
     def get(self, id):
         return {'professors': marshal(Professor.query.filter_by(id=id).first(), self.fields)}
